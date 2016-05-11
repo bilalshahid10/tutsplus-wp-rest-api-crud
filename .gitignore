@@ -1,0 +1,10 @@
+# Dependency directories
+node_modules
+bower_components
+public/lib
+
+# Cache directories
+.sass-cache
+
+# Compiled source directory
+dist

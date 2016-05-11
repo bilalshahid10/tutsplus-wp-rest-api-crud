@@ -1,0 +1,21 @@
+/* ==========================================================================
+   Author's custom styles
+   ========================================================================== */
+.posts-container {
+	padding-top: 30px;
+}
+
+.post-entry {
+	border: 1px solid #ccc;
+	padding-top: 20px;
+	padding-bottom: 20px;
+	margin-bottom: 20px;
+}
+
+/* post creation form */
+.post-form,
+.credentials-form {
+	width: 450px;
+	max-width: 100%;
+	margin-top: 50px;
+}
