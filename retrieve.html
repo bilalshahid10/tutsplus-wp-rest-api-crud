@@ -15,7 +15,7 @@
 
     <div class="container">
     	<div class="row posts-container" id="posts-container">
-    		<div class="col-md-12 post-entry">
+    		<!-- <div class="col-md-12 post-entry">
     			<h2>The Post Title</h2>
     			<div>
                     <p>The post excerpt</p>         
@@ -35,12 +35,49 @@
                     <p>The post excerpt</p>         
                 </div>
                 <a href="#" target="_blank">Read more</a>
-            </div>
+            </div> -->
+            <p>Loading posts...</p>
     	</div>
     </div>
 
 <script src="js/vendor/jquery-1.11.2.min.js"></script>
 <script src="js/vendor/bootstrap.min.js"></script>
 <script src="js/main.js"></script>
+<script>
+(function() {
+
+    // sending the ajax request
+    $.ajax( {
+        url: 'http://localhost/wordpress/wp-json/wp/v2/posts',
+        data: {
+            context: 'embed',
+            per_page: 5
+        },
+        success: function( posts ) {
+            // post container element
+            var postsContainer = $( '#posts-container' );
+
+            // resetting the html inside the post container
+            postsContainer.html( '' );
+
+            // iterating over the posts array
+            for ( var i = 0; i < posts.length; i++ ) {
+                // creating elements for post, title, excerpt, and post link
+                var postEntry = $( '<div class="post-entry col-md-12"></div>' ),
+                    postTitle = $( '<h2>' + posts[i].title.rendered + '</h2>' ),
+                    postExcerpt = $( '<div>' + posts[i].excerpt.rendered + '</div>' ),
+                    postLink = $( '<a href="' + posts[i].link + '" target="_blank">Read more</a>' );
+
+                // appending the title, excerpt, and post link to the main post element
+                postEntry.append( postTitle ).append( postExcerpt ).append( postLink );
+
+                // appending the main post element to the posts container
+                postsContainer.append( postEntry );
+            }
+        }
+    } );
+
+})();
+</script>
 </body>
 </html>

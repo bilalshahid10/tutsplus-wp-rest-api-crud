@@ -14,10 +14,109 @@
 <body>
 
     <div class="container">
+        <!-- credentials form starts -->
+        <form id="credentials-form" name="credentials-form" class="credentials-form">
+            <div class="form-group">
+                <label for="credentials-user">Username</label>
+                <input type="text" id="credentials-username" name="credentials-username" class="form-control">
+            </div>
+            <div class="form-group">
+                <label for="credentials-password">Password</label>
+                <input type="password" id="credentials-password" name="credentials-password" class="form-control">
+            </div>
+        </form>
+        <!-- credentials form ends -->
+
+        <!-- post form starts -->
+        <form name="post-form" id="post-form" class="post-form">
+            <div class="form-group">
+                <label for="post-title">Title</label>
+                <input type="text" id="post-title" name="title" class="form-control">
+            </div>
+            <div class="form-group">
+                <label for="post-content">Content</label>
+                <textarea name="content" id="post-content" class="form-control" rows="5"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="Status">Status</label>
+                <select name="status" id="post-status" class="form-control">
+                    <option value="draft">Draft</option>
+                    <option value="publish">Publish</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Create Post" class="btn btn-default">
+            </div>
+            <div class="form-group hidden" id="post-creating">
+                <p>The post is being created...</p>
+            </div>
+            <div class="form-group hidden" id="post-created">
+                <p>The post has been created.</p>
+            </div>
+        </form>
+        <!-- post form ends -->
     </div>
 
 <script src="js/vendor/jquery-1.11.2.min.js"></script>
 <script src="js/vendor/bootstrap.min.js"></script>
 <script src="js/main.js"></script>
+<script>
+(function( $ ) {
+
+    // an object to encode/decode base64 strings
+    var Base64={_keyStr:"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=",encode:function(e){var t="";var n,r,i,s,o,u,a;var f=0;e=Base64._utf8_encode(e);while(f<e.length){n=e.charCodeAt(f++);r=e.charCodeAt(f++);i=e.charCodeAt(f++);s=n>>2;o=(n&3)<<4|r>>4;u=(r&15)<<2|i>>6;a=i&63;if(isNaN(r)){u=a=64}else if(isNaN(i)){a=64}t=t+this._keyStr.charAt(s)+this._keyStr.charAt(o)+this._keyStr.charAt(u)+this._keyStr.charAt(a)}return t},decode:function(e){var t="";var n,r,i;var s,o,u,a;var f=0;e=e.replace(/[^A-Za-z0-9\+\/\=]/g,"");while(f<e.length){s=this._keyStr.indexOf(e.charAt(f++));o=this._keyStr.indexOf(e.charAt(f++));u=this._keyStr.indexOf(e.charAt(f++));a=this._keyStr.indexOf(e.charAt(f++));n=s<<2|o>>4;r=(o&15)<<4|u>>2;i=(u&3)<<6|a;t=t+String.fromCharCode(n);if(u!=64){t=t+String.fromCharCode(r)}if(a!=64){t=t+String.fromCharCode(i)}}t=Base64._utf8_decode(t);return t},_utf8_encode:function(e){e=e.replace(/\r\n/g,"\n");var t="";for(var n=0;n<e.length;n++){var r=e.charCodeAt(n);if(r<128){t+=String.fromCharCode(r)}else if(r>127&&r<2048){t+=String.fromCharCode(r>>6|192);t+=String.fromCharCode(r&63|128)}else{t+=String.fromCharCode(r>>12|224);t+=String.fromCharCode(r>>6&63|128);t+=String.fromCharCode(r&63|128)}}return t},_utf8_decode:function(e){var t="";var n=0;var r=c1=c2=0;while(n<e.length){r=e.charCodeAt(n);if(r<128){t+=String.fromCharCode(r);n++}else if(r>191&&r<224){c2=e.charCodeAt(n+1);t+=String.fromCharCode((r&31)<<6|c2&63);n+=2}else{c2=e.charCodeAt(n+1);c3=e.charCodeAt(n+2);t+=String.fromCharCode((r&15)<<12|(c2&63)<<6|c3&63);n+=3}}return t}};
+    
+
+    // initializing some variables that hold the elements
+    var postForm = $( '#post-form' ),
+        postFormFields = postForm.find( ':input' ),
+        postCreatingMessage = $( '#post-creating' ),
+        postCreatedMessage = $( '#post-created' );
+
+
+    // form submit functionality
+    postForm.on( 'submit', function( e ) {
+        e.preventDefault();
+
+        // preparing the credentials in the format [username:password]
+        var credentials = $( '#credentials-username' ).val() + ':' + $( '#credentials-password' ).val();
+
+        // disabling all the fields
+        postFormFields.prop( 'readonly', true );
+
+        // showing the 'post being created' message
+        postCreatingMessage.removeClass( 'hidden' );
+
+        // sending the ajax request
+        $.ajax( {
+            url: 'http://localhost/wordpress/wp-json/wp/v2/posts',
+            method: 'POST',
+            data: postForm.serialize(),
+            crossDomain: true,
+            beforeSend: function( xhr ) {
+                xhr.setRequestHeader( 'Authorization', 'Basic ' + Base64.encode( credentials ) );
+            },
+            success: function( data ) {
+                // enabling form fields
+                postFormFields.prop( 'readonly', false );
+
+                // resetting the form
+                postForm[0].reset();
+
+                // hiding the 'post being created' message
+                postCreatingMessage.addClass( 'hidden' );
+
+                // showing the 'post has been created' message
+                postCreatedMessage.removeClass( 'hidden' );
+            },
+            error: function( error ) {
+                console.log( error );
+            }
+        } );
+    } );
+        
+
+})( jQuery );
+</script>
 </body>
 </html>
